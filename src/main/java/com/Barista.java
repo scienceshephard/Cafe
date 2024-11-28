@@ -1,5 +1,7 @@
 package com;
 
+import com.Service.ClientHandler;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -35,31 +37,29 @@ public class Barista {
             try{
                 socket=serverSocket.accept();
                 System.out.println("A new device has connected");
-                Thread thread= new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                    BroadCastMessages();
-                    }
-                });
+                ClientHandler clientHandler= new ClientHandler(socket);
+                Thread thread= new Thread(clientHandler);
+                thread.start();
+
             } catch (IOException e) {
                 closeEverything(bufferedReader, bufferedWriter, serverSocket);
             }
         }
     }
 
-    public void BroadCastMessages(){
-        try {
-            bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            bufferedWriter= new BufferedWriter( new OutputStreamWriter(socket.getOutputStream()));
-            msg= bufferedReader.readLine();
-            bufferedWriter.write(msg);
-            bufferedWriter.newLine();
-            bufferedWriter.flush();
-
-        } catch (IOException e) {
-            closeEverything(bufferedReader, bufferedWriter, serverSocket);
-        }
-    }
+//    public void BroadCastMessages(){
+//        try {
+//            bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+//            bufferedWriter= new BufferedWriter( new OutputStreamWriter(socket.getOutputStream()));
+//            msg= bufferedReader.readLine();
+//            bufferedWriter.write(msg);
+//            bufferedWriter.newLine();
+//            bufferedWriter.flush();
+//
+//        } catch (IOException e) {
+//            closeEverything(bufferedReader, bufferedWriter, serverSocket);
+//        }
+//    }
 
     private void closeEverything(BufferedReader bufferedReader, BufferedWriter bufferedWriter, ServerSocket serverSocket) {
         try{
