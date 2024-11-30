@@ -1,4 +1,4 @@
-package com.Service;
+package helpers;
 
 public class CustomerData {
 

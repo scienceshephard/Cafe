@@ -1,6 +1,4 @@
-package com;
-
-import com.Service.ClientHandler;
+import helpers.ClientHandler;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -13,7 +11,6 @@ public class Barista {
     private BufferedReader bufferedReader;
     private BufferedWriter bufferedWriter;
     private Socket socket;
-    private String msg;
 
 
 
@@ -28,7 +25,7 @@ public class Barista {
         try {
             File file = new File("server.log");
             PrintWriter printWriter = new PrintWriter(file);
-            printWriter.println("Pelican Server running...");
+            printWriter.print("Pelican Server running...");
             printWriter.close();
         } catch (FileNotFoundException fileNotFoundException) {
             fileNotFoundException.printStackTrace();
@@ -47,20 +44,6 @@ public class Barista {
         }
     }
 
-//    public void BroadCastMessages(){
-//        try {
-//            bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-//            bufferedWriter= new BufferedWriter( new OutputStreamWriter(socket.getOutputStream()));
-//            msg= bufferedReader.readLine();
-//            bufferedWriter.write(msg);
-//            bufferedWriter.newLine();
-//            bufferedWriter.flush();
-//
-//        } catch (IOException e) {
-//            closeEverything(bufferedReader, bufferedWriter, serverSocket);
-//        }
-//    }
-
     private void closeEverything(BufferedReader bufferedReader, BufferedWriter bufferedWriter, ServerSocket serverSocket) {
         try{
             if(bufferedReader == null)bufferedReader.close();
@@ -72,7 +55,6 @@ public class Barista {
     }
 
     public static void main(String[] args) throws IOException{
-
         ServerSocket serverSocket= new ServerSocket(PORT_NUMBER);
         Barista barista = new Barista(serverSocket);
         barista.startServer();

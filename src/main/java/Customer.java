@@ -1,4 +1,4 @@
-package com;
+import com.google.gson.Gson;
 
 import java.io.*;
 import java.net.Socket;
@@ -8,26 +8,18 @@ public class Customer {
 
     private Socket socket;
     private String username;
-    private BufferedReader buffereReader;
+    private BufferedReader bufferedReader;
     private BufferedWriter bufferedWriter;
-
+    Gson gson = new Gson();
     Customer(Socket socket, String username){
         try {
             this.socket = socket;
             this.username = username;
-            this.buffereReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            this.bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             this.bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
         } catch (IOException e) {
-            closeEverything(bufferedWriter, buffereReader, socket);
+            closeEverything(bufferedWriter, bufferedReader, socket);
         }
-    }
-    public static void main(String[] args) throws IOException{
-        Scanner scn = new Scanner(System.in);
-        System.out.println("Enter your username: ");
-        String username = scn.nextLine();
-        Customer customer= new Customer(new Socket("localhost", Barista.PORT_NUMBER), username);
-        customer.ListenForMessage();
-        customer.sendMsg();
     }
     private void sendMsg(){
         try{
@@ -37,12 +29,20 @@ public class Customer {
             Scanner readInput = new Scanner(System.in);
             while (socket.isConnected()){
                 String message= readInput.nextLine();
+                if(message.equalsIgnoreCase("exit")){
+                    bufferedWriter.write("exit");
+                    bufferedWriter.newLine();
+                    bufferedWriter.flush();
+                    closeEverything(bufferedWriter, bufferedReader, socket);
+                    System.exit(0);
+                    break;
+                }
                 bufferedWriter.write(username + ": " + message);
                 bufferedWriter.newLine();
                 bufferedWriter.flush();
             }
         }catch (IOException e){
-            closeEverything(bufferedWriter, buffereReader, socket);
+            closeEverything(bufferedWriter, bufferedReader, socket);
         }
     }
     private void ListenForMessage(){
@@ -52,10 +52,10 @@ public class Customer {
                 String msgFromGroupChat;
                 while (socket.isConnected()){
                     try{
-                        msgFromGroupChat = buffereReader.readLine();
+                        msgFromGroupChat = bufferedReader.readLine();
                         System.out.println(msgFromGroupChat);
                     } catch (IOException e) {
-                        closeEverything(bufferedWriter, buffereReader,socket);
+                        closeEverything(bufferedWriter, bufferedReader,socket);
                     }
                 }
             }
@@ -73,4 +73,12 @@ public class Customer {
         }
     }
 
+    public static void main(String[] args) throws IOException{
+        Scanner scn = new Scanner(System.in);
+        System.out.println("Enter your username: ");
+        String username = scn.nextLine();
+        Customer customer= new Customer(new Socket("localhost", Barista.PORT_NUMBER), username);
+        customer.ListenForMessage();
+        customer.sendMsg();
+    }
 }
